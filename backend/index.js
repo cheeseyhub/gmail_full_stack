@@ -3,6 +3,8 @@ import GetRouter from "./routes/GetRouter.js";
 import SendRouter from "./routes/SendRouter.js";
 import mongoose from "mongoose";
 import { loadEnvFile } from "node:process";
+import LoginRouter from "./routes/LoginRouter.js";
+
 loadEnvFile();
 
 const app = express();
@@ -16,6 +18,7 @@ app.get("/", (req, res, next) => {
 });
 app.use("/get", GetRouter);
 app.use("/send", SendRouter);
+app.use("/login", LoginRouter);
 
 mongoose
   .connect(process.env.MONGO_URI)
