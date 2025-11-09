@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import jwt from "jsonwebtoken";
 const userSchema = mongoose.Schema({
   email: {
     type: String,
@@ -17,7 +17,20 @@ const userSchema = mongoose.Schema({
     },
   ],
 });
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET);
+  return token;
+};
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
 
-const userModel = mongoose.model("User", userSchema);
+  delete userObject.password;
+  delete userObject.tokens;
 
-export default userModel;
+  return userObject;
+};
+
+const UserModel = mongoose.model("User", userSchema);
+
+export default UserModel;
