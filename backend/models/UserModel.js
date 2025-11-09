@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
+import jwt from "json-web-token";
 const userSchema = mongoose.Schema({
   email: {
     type: String,
