@@ -1,6 +1,5 @@
 import express from "express";
 import { body } from "express-validator";
-import bcrypt from "bcrypt";
 
 import UserModel from "../models/UserModel.js";
 const UserRouter = express.Router();
@@ -30,16 +29,13 @@ UserRouter.post(
   ],
   async (req, res, next) => {
     const { name, email, password } = req.body;
-
-    //Encrypting password using bycrpt
-    const encryptedPassword = await bcrypt.hash(password, 10);
-
+    const encryptedPassword = await UserModel.encryptPassword(password);
     const user = await UserModel.create({
       name: name,
       email: email,
       password: encryptedPassword,
     });
-    console.log(user.name, user.email);
+
     res.status(201).send("User Created Successfully");
   },
 );

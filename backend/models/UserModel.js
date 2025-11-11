@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import jwt from "json-web-token";
+import bcrypt from "bcrypt";
 const userSchema = mongoose.Schema({
   name: {
     type: String,
@@ -33,6 +34,10 @@ userSchema.methods.toJSON = function () {
   delete userObject.tokens;
 
   return userObject;
+};
+userSchema.statics.encryptPassword = async function (password) {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
 };
 
 const UserModel = mongoose.model("User", userSchema);
