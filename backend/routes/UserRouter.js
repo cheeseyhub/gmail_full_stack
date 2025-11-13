@@ -33,6 +33,11 @@ UserRouter.post(
       return res.status(400).send({ error: "Invalid password" });
     }
 
+    const token = await UserModel.generateAuthToken(user._id);
+
+    //When connected with frontend;
+    // localStorage.setItem("token", token);
+
     res.status(200).send({ message: "Login successful" });
   },
 );

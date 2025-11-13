@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import jwt from "json-web-token";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const userSchema = mongoose.Schema({
   name: {
@@ -22,8 +22,9 @@ const userSchema = mongoose.Schema({
     },
   ],
 });
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET);
+userSchema.statics.generateAuthToken = function (id) {
+  const expirationTime = Math.floor(Date.now() / 1000) + 60 * 60;
+  const token = jwt.sign({ _id: id, exp: expirationTime }, process.env.SECRET);
   return token;
 };
 userSchema.methods.toJSON = function () {
