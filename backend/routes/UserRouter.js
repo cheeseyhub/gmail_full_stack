@@ -8,16 +8,35 @@ UserRouter.get("/", async (req, res) => {
   const users = await UserModel.find();
   res.json(users);
 });
-UserRouter.post(
-  "/",
 
-  (req, res) => {
+UserRouter.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Invalid email format"),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long"),
+  ],
+
+  async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(400).send({ error: "User not found" });
+
+    const isPasswordValid = await UserModel.comparePassword(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      return res.status(400).send({ error: "Invalid password" });
     }
+
+    res.status(200).send({ message: "Login successful" });
   },
 );
+
 UserRouter.post(
   "/create",
   [
@@ -35,7 +54,6 @@ UserRouter.post(
       email: email,
       password: encryptedPassword,
     });
-
     res.status(201).send("User Created Successfully");
   },
 );
