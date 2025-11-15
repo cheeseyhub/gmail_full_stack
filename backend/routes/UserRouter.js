@@ -1,5 +1,5 @@
 import express from "express";
-import { body } from "express-validator";
+import { body, validationResult } from "express-validator";
 
 import UserModel from "../models/UserModel.js";
 const UserRouter = express.Router();
@@ -9,49 +9,43 @@ UserRouter.get("/", async (req, res) => {
   res.json(users);
 });
 
-UserRouter.post(
-  "/login",
-  [
-    body("email").isEmail().withMessage("Invalid email format"),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long"),
-  ],
+UserRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-  async (req, res) => {
-    const { email, password } = req.body;
+  const user = await UserModel.findOne({ email });
+  if (!user) return res.status(400).send({ error: "User not found" });
 
-    const user = await UserModel.findOne({ email });
-    if (!user) return res.status(400).send({ error: "User not found" });
+  const isPasswordValid = await UserModel.comparePassword(
+    password,
+    user.password,
+  );
 
-    const isPasswordValid = await UserModel.comparePassword(
-      password,
-      user.password,
-    );
+  if (!isPasswordValid) {
+    return res.status(400).send({ error: "Invalid password" });
+  }
 
-    if (!isPasswordValid) {
-      return res.status(400).send({ error: "Invalid password" });
-    }
+  const token = await UserModel.generateAuthToken(user._id);
 
-    const token = await UserModel.generateAuthToken(user._id);
-
-    //When connected with frontend;
-    // localStorage.setItem("token", token);
-
-    res.status(200).send({ message: "Login successful" });
-  },
-);
+  res.status(200).send({ message: "Login successful", token: token });
+});
 
 UserRouter.post(
   "/create",
   [
-    body("name").isString().withMessage("Name must be a string"),
-    body("email").isEmail().withMessage("Invalid email format"),
+    body("name").notEmpty().isString().withMessage("Name must be a string"),
+    body("email").notEmpty().isEmail().withMessage("Invalid email format"),
     body("password")
+      .notEmpty()
       .isLength({ min: 8 })
       .withMessage("Password must be at least 8 characters long"),
   ],
   async (req, res, next) => {
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+      return res.send(400).json({ errors: result.array() });
+    }
+
     const { name, email, password } = req.body;
     const encryptedPassword = await UserModel.encryptPassword(password);
     const user = await UserModel.create({

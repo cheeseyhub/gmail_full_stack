@@ -19,6 +19,15 @@ app.get("/", (req, res, next) => {
 app.use("/user", UserRouter);
 app.use("/mail", MailRouter);
 
+app.use((req, res, next) => {
+  return res.status(404).send("Nothing to see here !");
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  return res.status(500).send("Internal Server Error");
+});
+
 if (process.env.NODE_ENV === "production") {
   mongoose
     .connect(process.env.MONGO_URI)
