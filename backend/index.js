@@ -19,13 +19,15 @@ app.get("/", (req, res, next) => {
 app.use("/user", UserRouter);
 app.use("/mail", MailRouter);
 
-app.use((req, res, next) => {
-  return res.status(404).send("Nothing to see here !");
+app.all("/*splat", (req, res, next) => {
+  const error = new Error(`Page not found ${req.originalUrl}`);
+  error.status = 404;
+  next(error);
 });
-
 app.use((err, req, res, next) => {
-  console.log(err);
-  return res.status(500).send("Internal Server Error");
+  if (err.code === 404) {
+    return res.status(404).send("Page Not Found");
+  }
 });
 
 if (process.env.NODE_ENV === "production") {
