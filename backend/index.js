@@ -25,9 +25,7 @@ app.all("/*splat", (req, res, next) => {
   next(error);
 });
 app.use((err, req, res, next) => {
-  if (err.code === 404) {
-    return res.status(404).send("Page Not Found");
-  }
+  console.log(err);
 });
 
 if (process.env.NODE_ENV === "production") {
