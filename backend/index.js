@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import * as middlewares from "./middlewares/middlewares.js";
 
 import UserRouter from "./routes/UserRouter.js";
 import MailRouter from "./routes/MailRouter.js";
@@ -24,9 +25,8 @@ app.all("/*splat", (req, res, next) => {
   error.status = 404;
   next(error);
 });
-app.use((err, req, res, next) => {
-  console.log(err);
-});
+
+app.use(middlewares.errorHandler);
 
 if (process.env.NODE_ENV === "production") {
   mongoose

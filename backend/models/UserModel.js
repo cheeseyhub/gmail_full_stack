@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const userSchema = mongoose.Schema({
   name: {
@@ -34,7 +34,6 @@ userSchema.methods.toJSON = function () {
   const userObject = user.toObject();
 
   delete userObject.password;
-  delete userObject.tokens;
 
   return userObject;
 };
@@ -43,13 +42,20 @@ userSchema.statics.encryptPassword = async function (password) {
   return await bcrypt.hash(password, salt);
 };
 userSchema.statics.verifyToken = async function (token) {
-  //Todo:Handle token expiration;
-  const decoded = jwt.verify(token, process.env.SECRET);
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET);
 
-  //Todo:Handle finding user with the token;
-  const user = await this.findOne(decoded._id);
+    const user = await this.findOne({ _id: decoded._id });
+    console.log(user);
 
-  console.log(user);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  } catch (error) {
+    next(error);
+  }
 };
 userSchema.statics.comparePassword = async function (password, hashedPassword) {
   return await bcrypt.compare(password, hashedPassword);
