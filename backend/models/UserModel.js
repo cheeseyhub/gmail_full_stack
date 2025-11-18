@@ -41,22 +41,6 @@ userSchema.statics.encryptPassword = async function (password) {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
 };
-userSchema.statics.verifyToken = async function (token) {
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-
-    const user = await this.findOne({ _id: decoded._id });
-    console.log(user);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    return user;
-  } catch (error) {
-    next(error);
-  }
-};
 userSchema.statics.comparePassword = async function (password, hashedPassword) {
   return await bcrypt.compare(password, hashedPassword);
 };
