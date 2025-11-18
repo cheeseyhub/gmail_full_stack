@@ -7,7 +7,9 @@ MailRouter.post(
   "/check",
   [middlewares.tokenExtraction, middlewares.tokenVerification],
   (req, res, next) => {
-    return res.status(200).json({ message: "Working till here" });
+    return res
+      .status(200)
+      .json({ user: req.user, message: "Working till here" });
   },
 );
 export default MailRouter;

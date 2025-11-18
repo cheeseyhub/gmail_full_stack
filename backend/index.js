@@ -1,5 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
+
+//Registering Models
+import MailModel from "./models/MailModel.js";
+import UserModel from "./models/UserModel.js";
+
 import * as middlewares from "./middlewares/middlewares.js";
 
 import UserRouter from "./routes/UserRouter.js";

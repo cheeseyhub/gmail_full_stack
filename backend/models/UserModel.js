@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const userSchema = mongoose.Schema({
   name: {
@@ -34,6 +34,9 @@ userSchema.methods.toJSON = function () {
   const userObject = user.toObject();
 
   delete userObject.password;
+  delete userObject.__v;
+  userObject.id = userObject._id.toString();
+  delete userObject._id;
 
   return userObject;
 };
