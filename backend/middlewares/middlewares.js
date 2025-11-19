@@ -9,7 +9,6 @@ export const tokenExtraction = (req, res, next) => {
   if (parts.length != 2) {
     return res.status(401).json({ message: "Invalid token" });
   }
-
   const [scheme, token] = parts;
 
   if (scheme !== "Bearer") {
@@ -30,6 +29,7 @@ export const tokenVerification = async (req, res, next) => {
       throw new Error("User not found");
     }
 
+    //Add the user to the req object
     req.user = user.toJSON();
     next();
   } catch (error) {
@@ -43,5 +43,8 @@ export const errorHandler = (err, req, res, next) => {
   if (err.name === "TokenExpiredError") {
     return res.status(401).json({ error: err.name });
   }
-  res.status(statusCode).json({ status: statusCode, message: err.message });
+  if (err.message === "Receiver not found") {
+    return res.status(401).json({ error: err.message });
+  }
+  return res.status(statusCode).json({ error: err.message });
 };
