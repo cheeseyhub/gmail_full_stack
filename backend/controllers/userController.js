@@ -3,36 +3,52 @@ import { validationResult } from "express-validator";
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await UserModel.findOne({ email });
-  if (!user) return res.status(400).send({ error: "User not found" });
+  try {
+    const user = await UserModel.findOne({ email });
 
-  const isPasswordValid = await UserModel.comparePassword(
-    password,
-    user.password,
-  );
+    if (!user) {
+      const err = new Error("User not found");
+      err.status = 404;
+      return next(err);
+    }
 
-  if (!isPasswordValid) {
-    return res.status(400).send({ error: "Invalid password" });
+    const isPasswordValid = await UserModel.comparePassword(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      const err = new Error("Invalid Password");
+      err.status = 401;
+      return next(err);
+    }
+
+    const token = await UserModel.generateAuthToken(user._id);
+    res.status(200).send({ message: "Login successful", token: token });
+  } catch (error) {
+    return next(error);
   }
-
-  const token = await UserModel.generateAuthToken(user._id);
-
-  res.status(200).send({ message: "Login successful", token: token });
 };
 
 export const createUser = async (req, res, next) => {
   const result = validationResult(req);
 
-  if (!result.isEmpty()) {
-    return res.status(400).json({ errors: result.array() });
-  }
+  try {
+    if (!result.isEmpty()) {
+      const err = new Error("name,email, and password fields are required.");
+      err.code = 400;
+      return next(err);
+    }
 
-  const { name, email, password } = req.body;
-  const encryptedPassword = await UserModel.encryptPassword(password);
-  const user = await UserModel.create({
-    name: name,
-    email: email,
-    password: encryptedPassword,
-  });
-  res.status(201).send("User Created Successfully");
+    const { name, email, password } = req.body;
+    const encryptedPassword = await UserModel.encryptPassword(password);
+    const user = await UserModel.create({
+      name: name,
+      email: email,
+      password: encryptedPassword,
+    });
+    res.status(201).json({ message: "User Created Successfully", user: user });
+  } catch (error) {
+    return next(error);
+  }
 };

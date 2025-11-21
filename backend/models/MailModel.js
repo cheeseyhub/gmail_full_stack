@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const mailSchema = new mongoose.Schema({
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   sender: {
     type: String,
     required: true,

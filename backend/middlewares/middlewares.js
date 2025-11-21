@@ -3,16 +3,22 @@ import jwt from "jsonwebtoken";
 
 export const tokenExtraction = (req, res, next) => {
   if (!req.headers.authorization) {
-    return res.status(401).json({ message: "Invalid token" });
+    const err = new Error("Invalid token");
+    err.code = 401;
+    return next(err);
   }
   const parts = req.headers["authorization"].split(" ");
   if (parts.length != 2) {
-    return res.status(401).json({ message: "Invalid token" });
+    const err = new Error("Invalid token");
+    err.code = 401;
+    return next(err);
   }
   const [scheme, token] = parts;
 
   if (scheme !== "Bearer") {
-    return res.status(401).json({ message: "Invalid token" });
+    const err = new Error("Invalid token");
+    err.code = 401;
+    return next(err);
   }
   req.token = token;
 
@@ -26,25 +32,21 @@ export const tokenVerification = async (req, res, next) => {
       "emails",
     );
     if (!user) {
-      throw new Error("User not found");
+      const err = new Error("User not found");
+      err.code = 404;
+      return next(err);
     }
 
     //Add the user to the req object
     req.user = user.toJSON();
     next();
   } catch (error) {
-    error.status = 401;
-    next(error);
+    error.code = 401;
+    return next(error);
   }
 };
 
 export const errorHandler = (err, req, res, next) => {
-  const statusCode = err.status || 500;
-  if (err.name === "TokenExpiredError") {
-    return res.status(401).json({ error: err.name });
-  }
-  if (err.message === "Receiver not found") {
-    return res.status(401).json({ error: err.message });
-  }
+  const statusCode = err.status || err.code || 500;
   return res.status(statusCode).json({ error: err.message });
 };
