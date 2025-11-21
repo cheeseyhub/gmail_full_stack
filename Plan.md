@@ -11,3 +11,5 @@
 
                 Using the current 'user id' find user with the 'other  email'.
                 Then add the email to ther 'other email user' emails array.
+          "/delete":
+            - On the delete route the email of the current user with the specified id will be deleted.
