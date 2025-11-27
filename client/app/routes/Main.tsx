@@ -1,4 +1,5 @@
-import type { Route } from "./+types/main";
+import SideBar from "~/components/SideBar";
+import type { Route } from "./+types/Main";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function main() {
-  return <h1>Main Page</h1>;
+  return <SideBar />;
 }

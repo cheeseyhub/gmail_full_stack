@@ -14,20 +14,36 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/login": {
+    params: {};
+  };
+  "/create": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
+    page: "/" | "/login" | "/create";
+  };
+  "routes/Main.tsx": {
+    id: "routes/Main";
     page: "/";
   };
-  "routes/main.tsx": {
-    id: "routes/main";
-    page: "/";
+  "routes/Login.tsx": {
+    id: "routes/Login";
+    page: "/login";
+  };
+  "routes/CreateAccount.tsx": {
+    id: "routes/CreateAccount";
+    page: "/create";
   };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
-  "routes/main": typeof import("./app/routes/main.tsx");
+  "routes/Main": typeof import("./app/routes/Main.tsx");
+  "routes/Login": typeof import("./app/routes/Login.tsx");
+  "routes/CreateAccount": typeof import("./app/routes/CreateAccount.tsx");
 };
