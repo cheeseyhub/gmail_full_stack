@@ -1,4 +1,4 @@
-import SideBar from "~/components/SideBar";
+import Layout from "~/components/Layout";
 import type { Route } from "./+types/Main";
 
 export function meta({}: Route.MetaArgs) {
@@ -9,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function main() {
-  return <SideBar />;
+  return <Layout children={<div>Something</div>} />;
 }
