@@ -9,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function main() {
-  return <Layout children={<div>Something</div>} />;
+  return <Layout children={<div></div>} />;
 }
