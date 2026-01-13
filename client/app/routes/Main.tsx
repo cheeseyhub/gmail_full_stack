@@ -9,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function main() {
-  return <Layout children={<div></div>} />;
+  return <h1 className="text-3xl font-bold">Welcome to Gmail Clone</h1>;
 }
